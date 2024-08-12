@@ -44,8 +44,6 @@ class TronMap:
                     continue
 
 
-
-
     def game_finished(self):
         return self._num_players == 1
 
