@@ -13,7 +13,7 @@ def main():
         result = tron.add_move(x, y)
         print(result)
         tron.print_map()
-
+        print(f"The amount of reachable space 1 has is: {tron.count_reachable_spaces(1)}")
 
 
 if __name__ == '__main__':

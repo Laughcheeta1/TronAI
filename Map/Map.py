@@ -35,29 +35,7 @@ class TronMap:
             print(row)
 
     def get_available_moves(self):
-        player_position = self._positions[self._current_player - 1]
-        possible_moves = []
-
-        # Given that theres only 4 moves that can be made, might as well just 
-        # hard code them 
-
-        # Upper one
-        if (player_position[0], player_position[1] - 1) not in self._positions:
-            possible_moves.append((player_position[0], player_position[1] - 1))
-
-        # Lower one
-        if (player_position[0], player_position[1] + 1) not in self._positions:
-            possible_moves.append((player_position[0], player_position[1] + 1))
-
-        # Left one 
-        if (player_position[0] - 1, player_position[1]) not in self._positions:
-            possible_moves.append((player_position[0] - 1, player_position[1]))
-
-        # Right one
-        if (player_position[0] + 1, player_position[1]) not in self._positions:
-            possible_moves.append((player_position[0] + 1, player_position[1]))
-
-        return possible_moves
+        return tuple(self._get_available_moves(self._positions[self._current_player - 1]))
 
     def game_finished(self):
         return self._num_players == 1
@@ -75,6 +53,40 @@ class TronMap:
         self._next_player()
         return Constants.VALID, "Move was valid"
 
+    # TODO: define a better name for this function
+    def count_reachable_spaces(self, player: int, steps: int=3) -> int:
+        """
+        For this we will use BFS search
+        """
+        if player <= 0 or player > self._num_players:
+            raise Exception("That is not a valid player")
+
+        # Starts at -1 to account for adding the current place at first
+        possible_places_count = -1 
+        queue = [self._positions[player - 1]]
+        visited = set()
+
+        """
+        This will make sure that we only go thorught this will make sure we only go throuht the
+        steps we want, because the first layer, is going to be passed throught in the first loop,
+        the second layer in the second loop, and so on and so forth
+        to the visited. When we finished thi
+        """
+        for _ in range(steps):
+            for place in queue.copy():
+                for neighbour in self._get_safe_moves(place):
+                    if neighbour not in queue and neighbour not in visited:
+                        queue.append(neighbour)
+
+                queue.pop()
+                visited.add(place)
+            
+        visited.update(queue)
+
+        return len(visited)
+
+    def _get_safe_moves(self)
+
     def _next_player(self) -> None:
         self._current_player = (self._current_player % self._num_players) + 1
 
@@ -91,9 +103,24 @@ class TronMap:
 
         return positions
 
+    def _get_valid_neighbours_cells(self):  # TODO: correct this
+        player_position = self._positions[self._current_player - 1]
+        possible_moves = []
+
+        for i in range(player_position[0] - 1, player_position[0] + 2):
+            if i < 0 or i >= self._width:
+                continue
+
+            for j in range(player_position[1] - 1, player_position[1] + 2):
+                if j < 0 or j >= self._height:
+                    continue
+            
+                if (i, j) not in self._positions:
+                    possible_moves.append((i, j))
+
     def _check_invalid_move(self, x: int, y: int) -> str:
         current_position = self._positions[self._current_player - 1]
-        
+
         if abs(x - current_position[0]) > 1 or abs(y - current_position[1]) > 1:
             return "Cannot move further than one square at a time"
 
@@ -107,3 +134,26 @@ class TronMap:
 
     def _get_death_message(self, killer: int):
         return f"Player {self._current_player} was killed by Player {killer}"
+    
+    def _get_available_moves(self, player_position) -> tuple[int, int]:
+        # Given that theres only 4 moves that can be made, might as well just 
+        # hard code them 
+
+        # TODO: do not add moves that are out of bounds
+        # TODO: show movements even if it runs into other oponents
+
+        # Upper one
+        if (player_position[0], player_position[1] - 1) not in self._positions:
+            yield((player_position[0], player_position[1] - 1))
+
+        # Lower one
+        if (player_position[0], player_position[1] + 1) not in self._positions:
+            yield((player_position[0], player_position[1] + 1))
+
+        # Left one 
+        if (player_position[0] - 1, player_position[1]) not in self._positions:
+            yield((player_position[0] - 1, player_position[1]))
+
+        # Right one
+        if (player_position[0] + 1, player_position[1]) not in self._positions:
+            yield((player_position[0] + 1, player_position[1]))
