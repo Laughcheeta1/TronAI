@@ -16,8 +16,10 @@ class TronMap:
         self._current_player = 1
         self._positions = self._generate_random_positions()
         
+        # we put map[y][x] because in the structure defined in line 14,
+        # each row y contains the columns x
         for i, pos in enumerate(self._positions):
-            self._map[pos[0]][pos[1]] = i + 1
+            self._map[pos[1]][pos[0]] = i + 1
 
     def get_map(self):
         return self._map
@@ -32,8 +34,9 @@ class TronMap:
         for row in self._map:
             print(row)
 
-    def get_available_move(self):
+    def get_available_moves(self):
         player_position = self._positions[self._current_player - 1]
+        possible_moves = []
 
         for i in range(player_position[0] - 1, player_position[0] + 2):
             if i < 0 or i >= self._width:
@@ -42,7 +45,11 @@ class TronMap:
             for j in range(player_position[1] - 1, player_position[1] + 2):
                 if j < 0 or j >= self._height:
                     continue
-
+            
+                if (i, j) not in self._positions:
+                    possible_moves.append((i, j))
+        
+        return possible_moves
 
     def game_finished(self):
         return self._num_players == 1
@@ -57,7 +64,7 @@ class TronMap:
         self._map[y][x] = self._current_player
         self._positions[self._current_player - 1] = (x, y)
         self._next_player()
-        return Constants.VALID, "Move was valid":
+        return Constants.VALID, "Move was valid"
 
     def _next_player(self) -> None:
         self._current_player = (self._current_player % self._num_players) + 1
@@ -89,7 +96,7 @@ class TronMap:
     def _check_player_dead(self, x: int, y: int) -> int:
         # If the position in the map is cero that means no one was there, therefore the player is safe
         # (in python 0 is a falsy value, that means "if 0" will result in NOT executing the if statement)
-        return self._map[x][y]
+        return self._map[y][x]
 
     def _get_death_message(self, killer: int):
         return f"Player {self._current_player} was killed by Player {killer}"

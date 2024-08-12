@@ -9,8 +9,10 @@ def main():
         x = int(input("Enter X coordinate: "))
         y = int(input("Enter Y coordinate: "))
 
-        tron.add_move(x, y)
-        result = tron.print_map()
+        print(tron.get_available_moves())
+        result = tron.add_move(x, y)
+        print(result)
+        tron.print_map()
 
 
 
