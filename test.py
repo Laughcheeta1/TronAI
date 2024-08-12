@@ -6,10 +6,10 @@ def main():
     tron.print_map()
 
     while not tron.game_finished():
+        print(tron.get_available_moves())
         x = int(input("Enter X coordinate: "))
         y = int(input("Enter Y coordinate: "))
 
-        print(tron.get_available_moves())
         result = tron.add_move(x, y)
         print(result)
         tron.print_map()

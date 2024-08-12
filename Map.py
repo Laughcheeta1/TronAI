@@ -59,6 +59,7 @@ class TronMap:
             return Constants.INVALID, message
 
         if killer := self._check_player_dead(x, y):  # Player stepped in a trail of another player
+            self._num_players -= 1
             return Constants.PLAYER_DEAD, self._get_death_message(killer)
 
         self._map[y][x] = self._current_player
@@ -84,7 +85,7 @@ class TronMap:
 
     def _check_invalid_move(self, x: int, y: int) -> str:
         current_position = self._positions[self._current_player - 1]
-        if abs(x - current_position[0]) != 1 or abs(y - current_position[1]):
+        if abs(x - current_position[0]) > 1 or abs(y - current_position[1]) > 1:
             return "Cannot move further than one square at a time"
 
         if (x, y) in self._positions:
