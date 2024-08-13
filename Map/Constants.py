@@ -1,3 +1,3 @@
-INVALID = "Invalid Move"
-VALID = "Valid Move"
-PLAYER_DEAD = "Player Destroyed"
+INVALID = 400
+VALID = 200
+PLAYER_DEAD = 202
