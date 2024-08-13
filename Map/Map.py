@@ -147,8 +147,11 @@ class TronMap:
     def _check_invalid_move(self, x: int, y: int) -> str:
         current_position = self._positions[self._current_player - 1]
 
-        if abs(x - current_position[0]) > 1 or abs(y - current_position[1]) > 1:
+        if (movement_x := abs(x - current_position[0])) > 1 or (movement_y := abs(y - current_position[1])) > 1:
             return "Cannot move further than one square at a time"
+
+        if movement_x == 1 and movement_y == 1:
+            return "Cannot move diagonally"
 
         # It is moving to the current position of a player
         return ""
