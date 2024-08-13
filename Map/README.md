@@ -24,7 +24,7 @@ The Map class has the following public methods:
 -  `get_available_moves(self) -> tuple[int, int]`: returns the available moves for the current player, that is, the
     player that has the turn.
 -  `game_finished(self) -> bool`: returns True if the game has come to an end, False otherwise.
--  `add_move(self, x: int, y: int) -> tuple[int, str]`: makes a move for the current player.
+-  `add_move(self, x: int, y: int) -> tuple[int, str]`: makes a move for the current player. After making the move, automatically the turn will be passed to the next player.
 -  `count_reachable_spaces(self, player: int, steps: int = 3) -> int`: returns the number of reachable spaces for a 
     player in a certain number of steps (Supposes that the opponent is not going to move, this is for the heuristic of 
     the game).

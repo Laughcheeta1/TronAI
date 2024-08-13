@@ -134,6 +134,8 @@ class TronMap:
         that has the turn at the moment.
         It will return both a status of the move, and a message of the result of the move.
 
+        After making the move, automatically the turn will be passed to the next player.
+
         The status is meant to be operated for by the developer, the message is meant to be shown to the user.
 
         All the possible status can be found in the Constants.py file
