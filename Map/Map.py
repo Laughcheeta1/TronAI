@@ -21,6 +21,14 @@ class TronMap:
         for i, pos in enumerate(self._positions):
             self._map[pos[1]][pos[0]] = i + 1
 
+    # TODO delete this
+    def set_map(self, new_map):
+        self._map = new_map
+
+    # TODO delete this
+    def set_positions(self, new_positions):
+        self._positions = new_positions
+
     def get_map(self):
         return self._map
 
@@ -40,6 +48,7 @@ class TronMap:
     def game_finished(self):
         return self._num_players == 1
 
+    # TODO disable diagonal movements
     def add_move(self, x: int, y: int) -> tuple[str, str]:
         if message := self._check_invalid_move(x, y):
             return Constants.INVALID, message
@@ -61,8 +70,6 @@ class TronMap:
         if player <= 0 or player > self._num_players:
             raise Exception("That is not a valid player")
 
-        # Starts at -1 to account for adding the current place at first
-        possible_places_count = -1 
         queue = [self._positions[player - 1]]
         visited = set()
 
@@ -78,14 +85,33 @@ class TronMap:
                     if neighbour not in queue and neighbour not in visited:
                         queue.append(neighbour)
 
-                queue.pop()
+                queue.pop(0)
                 visited.add(place)
             
         visited.update(queue)
 
-        return len(visited)
+        # -1 to account for adding the current place at first
+        return len(visited) - 1
 
-    def _get_safe_moves(self)
+    """
+    Returns a generator with the possible non ending moves that can be made
+    """
+    def _get_safe_moves(self, place):
+        # Upper one
+        if place[1] - 1 >= 0 and self._map[place[1] - 1][place[0]] == 0:
+            yield place[0], place[1] - 1
+
+        # Lower one
+        if place[1] + 1 < self._height and self._map[place[1] + 1][place[0]] == 0:
+            yield place[0], place[1] + 1
+
+        # Left one
+        if place[0] - 1 >= 0 and self._map[place[1]][place[0] - 1] == 0:
+            yield place[0] - 1, place[1]
+
+        # Right one
+        if place[0] + 1 < self._width and self._map[place[1]][place[0] + 1] == 0:
+            yield place[0] + 1, place[1]
 
     def _next_player(self) -> None:
         self._current_player = (self._current_player % self._num_players) + 1
@@ -144,16 +170,16 @@ class TronMap:
 
         # Upper one
         if (player_position[0], player_position[1] - 1) not in self._positions:
-            yield((player_position[0], player_position[1] - 1))
+            yield player_position[0], player_position[1] - 1
 
         # Lower one
         if (player_position[0], player_position[1] + 1) not in self._positions:
-            yield((player_position[0], player_position[1] + 1))
+            yield player_position[0], player_position[1] + 1
 
         # Left one 
         if (player_position[0] - 1, player_position[1]) not in self._positions:
-            yield((player_position[0] - 1, player_position[1]))
+            yield player_position[0] - 1, player_position[1]
 
         # Right one
         if (player_position[0] + 1, player_position[1]) not in self._positions:
-            yield((player_position[0] + 1, player_position[1]))
+            yield player_position[0] + 1, player_position[1]
