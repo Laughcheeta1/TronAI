@@ -15,6 +15,7 @@ that means, the numbers grow from left to right and from top to bottom (a cartes
 in the x-axis).
 
 The Map class has the following public methods:
+- `get_current_player(self) -> int`: returns the player that has the turn.
 - `__init__(self, width=6, height=6, num_players=2)`: Constructor, initializes the map.
 - `def get_map(self) -> list[list[int]]`: returns the matrix representing the map of the game.
 - `def get_players_positions(self) -> list[tuple[int, int]]`: returns the positions of all players as a list of tuples.

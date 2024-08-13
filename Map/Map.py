@@ -30,6 +30,16 @@ class TronMap:
         for i, pos in enumerate(self._positions):
             self._map[pos[1]][pos[0]] = i + 1
 
+    def get_current_player(self) -> int:
+        """
+        Get the player that has the turn
+
+        Returns
+        -------
+            Integer representing the current player
+        """
+        return self._current_player
+
     def get_map(self) -> list[list[int]]:
         """
         Get the map of the game
