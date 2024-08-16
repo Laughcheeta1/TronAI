@@ -2,13 +2,27 @@ from .Node import Node
 import numpy as np
 
 class Tree ():
-  def __init__(self, root ,operators):
+  def __init__(self, root ,operators) -> None:
+    """
+    Initializes the Tree with a root node and a list of operators.
+    
+    Parameters:
+    - root: The root node of the tree.
+    - operators: A list of operators available for the tree.
+    
+    Returns: None
+    """
     self.root=root
     self.operators=operators
 
-  def printPath(self,n):
+  def printPath(self,n) -> list[str]:
     """
-      TODO: fill this out
+    Prints the path from the given node to the root node and returns the path.
+    
+    Parameters:
+    - n: The node from which to start the path.
+    
+    Returns: A list of nodes representing the path from the given node to the root node.
     """
     stack=n.pathObjective()
     path=stack.copy()
@@ -20,9 +34,11 @@ class Tree ():
             print(f' {node.state}')
     return path
 
-  def reinitRoot(self):
+  def reinitRoot(self) -> None:
     """
-      TODO: fill this out
+    Reinitializes the root node by resetting its operator, parent, objective, children, and level.
+    
+    Returns: None
     """
     self.root.operator=None
     self.root.parent=None
@@ -32,7 +48,13 @@ class Tree ():
 
   def alfaBeta(self, depth, maxPlayer = True) -> Node:
     """
-      TODO: Fill this out
+    Performs the AlphaBeta pruning algorithm to determine the best move.
+    
+    Parameters:
+    - depth: The depth to which the algorithm should search.
+    - maxPlayer: Boolean indicating if the current move is by the maximizing player (default is True).
+    
+    Returns: The node representing the best move.
     """
 
     self.root.beta, self.root.alpha = self.alfaBetaR(self.root, depth-1, maxPlayer, -np.inf, np.inf)
@@ -52,6 +74,18 @@ class Tree ():
     return self.root.children[index]
 
   def alfaBetaR(self, node, depth, maxPlayer, alpha, beta) -> tuple[float, float]:
+    """
+    Recursively performs the AlphaBeta pruning algorithm.
+    
+    Parameters:
+    - node: The current node being evaluated.
+    - depth: The current depth in the tree.
+    - maxPlayer: Boolean indicating if the current move is by the maximizing player.
+    - alpha: The alpha value for pruning.
+    - beta: The beta value for pruning.
+    
+    Returns: A tuple containing the alpha and beta values.
+    """
     if depth==0 or node.isObjective():
       if maxPlayer:
         node.alpha=node.heuristic()

@@ -6,13 +6,30 @@ class NodeTicTacToe(Node):
     This class is used exclusively for testing with the tic-tac-toe game
   """
 
-  def __init__(self, player = True, **kwargs):
+  def __init__(self, player: bool = True, **kwargs) -> None:
+    """
+    Initializes a NodeTicTacToe with a player indicator and other keyword arguments.
+    
+    Parameters:
+    - player: Boolean indicating if the player is Max (True) or Min (False).
+    - kwargs: Additional keyword arguments passed to the parent Node class.
+    
+    Returns: None
+    """
     super(NodeTicTacToe, self).__init__(**kwargs)
     self.player=player
     self.alpha=float('-inf')
     self.beta=float('inf')
 
-  def getState(self, index):
+  def getState(self, index: int) -> list[list[str]] | None:
+    """
+    Returns the next state of the board after applying the operator at the given index.
+    
+    Parameters:
+    - index: The index of the operator to apply.
+    
+    Returns: The next state of the board if the move is valid, otherwise None.
+    """
     state=self.state
     nextState=None
     (x,y)=self.operators[index]
@@ -24,8 +41,12 @@ class NodeTicTacToe(Node):
         nextState[x][y]='O'
     return nextState if state!=nextState else None
 
-  # Check if the state node is the objective node for Min or Max
-  def isObjective(self):
+  def isObjective(self) -> bool:
+    """
+    Checks if the current node's state is an objective state (win or draw).
+    
+    Returns: True if the current node's state is an objective state, False otherwise.
+    """
     a=[f.copy() for f in self.state]
     b=np.array(a).T
     a.append(np.diag(self.state))
@@ -40,8 +61,12 @@ class NodeTicTacToe(Node):
       return True
     return False
 
-  # If it is an objective node, if X return 1, if O -1 and if not 0
-  def heuristic(self):
+  def heuristic(self) -> int:
+    """
+    Returns a heuristic value for the node based on the state of the board.
+    
+    Returns: 1 if the state is a win for Max, -1 if the state is a win for Min, 0 if the state is a draw or non-terminal.
+    """
     a=[f.copy() for f in self.state]
     b=np.array(a).T
     a.append(np.diag(self.state))
