@@ -55,8 +55,7 @@ class Node ():
     self.children.append(node)
     return node
 
-  #Devuelve todos los estados según los operadores aplicados
-  def getChildren(self) -> List:
+  def getChildren(self) -> list:
     """
     Returns all the possible children of a node.
     
