@@ -1,19 +1,20 @@
-from .Node import Node
+from . import Node
 import numpy as np
 
 class Tree ():
-  def __init__(self, root ,operators) -> None:
+  def __init__(self, game, objective) -> None:
     """
-    Initializes the Tree with a root node and a list of operators.
+    Initializes the Tree with a root node and an objective for the game.
     
     Parameters:
-    - root: The root node of the tree.
-    - operators: A list of operators available for the tree.
-    
+    - game: The game object to be used for the tree.
+    - objective: The objective for the game (e.g., win for Max or Min).
+
     Returns: None
     """
-    self.root=root
-    self.operators=operators
+    self.game=game
+    self.objective=objective
+    self.root: Node = type(self).rootNode(game=game, objective=objective)
 
   def printPath(self,n) -> list[str]:
     """
@@ -29,7 +30,7 @@ class Tree ():
     while len(stack)!=0:
         node=stack.pop()
         if node.operator is not None:
-            print(f'operador:  {self.operators[node.operator]} \t estado: {node.state}')
+            print(f'operador:  {node.operator} \t estado: {node.state}')
         else:
             print(f' {node.state}')
     return path
@@ -42,11 +43,12 @@ class Tree ():
     """
     self.root.operator=None
     self.root.parent=None
-    self.root.objective=None
+    self.root.objective=self.objective
+    self.root.game=self.game
     self.root.children = []
     self.root.level=0
 
-  def alfaBeta(self, depth, maxPlayer = True) -> Node:
+  def alphaBeta(self, depth, maxPlayer = True) -> Node:
     """
     Performs the AlphaBeta pruning algorithm to determine the best move.
     
@@ -56,8 +58,8 @@ class Tree ():
     
     Returns: The node representing the best move.
     """
-
-    self.root.beta, self.root.alpha = self.alfaBetaR(self.root, depth-1, maxPlayer, -np.inf, np.inf)
+    # TODO: Change parameters to self.root.alpha and self.root.beta
+    self.root.beta, self.root.alpha = self.alphaBetaR(self.root, depth, maxPlayer, self.root.alpha, self.root.beta)
 
     if maxPlayer:
       # Compare all children of root and find the one with the maximum alpha
@@ -73,7 +75,7 @@ class Tree ():
 
     return self.root.children[index]
 
-  def alfaBetaR(self, node, depth, maxPlayer, alpha, beta) -> tuple[float, float]:
+  def alphaBetaR(self, node: Node, depth, maxPlayer, alpha, beta) -> tuple[int, int]:
     """
     Recursively performs the AlphaBeta pruning algorithm.
     
@@ -86,11 +88,11 @@ class Tree ():
     
     Returns: A tuple containing the alpha and beta values.
     """
-    if depth==0 or node.isObjective():
+    if depth == 0 or node.isObjective():
       if maxPlayer:
-        node.alpha=node.heuristic()
+        node.alpha = node.heuristic()
       else:
-        node.beta=node.heuristic()
+        node.beta = node.heuristic()
       return node.alpha, node.beta
     
     # Generate node children
@@ -100,25 +102,25 @@ class Tree ():
     if maxPlayer:
       for i,child in enumerate(children):
         if child is not None:
-          newChild=type(self.root)(value=node.value+'-'+str(i),state=child,operator=i,parent=node,
-                                   operators=node.operators,player=False)
-          newChild=node.add_node_child(newChild)
-          alpha=max(alpha,self.alfaBetaR(newChild,depth-1,False, alpha, beta)[1])
+          newChild = type(self.root)(value = node.value+'-'+str(i), state = child,operator=i, parent = node,
+                                      objective = self.objective, game = node.game, player=False)
+          newChild = node.add_node_child(newChild)
+          alpha = max(alpha,self.alphaBetaR(newChild,depth-1,False, alpha, beta)[1])
           newChild.alpha = alpha
           newChild.beta = beta
-          if alpha>=beta:
+          if alpha >= beta:
             break
 
     else: # Min player
       for i,child in enumerate(children):
         if child is not None:
-          newChild=type(self.root)(value=node.value+'-'+str(i),state=child,operator=i,parent=node,
-                                   operators=node.operators,player=True)
-          newChild=node.add_node_child(newChild)
-          beta=min(beta,self.alfaBetaR(newChild,depth-1,True, alpha, beta)[0])
+          newChild = type(self.root)(value = node.value+'-'+str(i), state = child, operator = i, parent = node,
+                                      objective = self.objective, game = node.game, player = True)
+          newChild = node.add_node_child(newChild)
+          beta = min(beta,self.alphaBetaR(newChild,depth-1,True, alpha, beta)[0])
           newChild.alpha = alpha
           newChild.beta = beta
-          if alpha>=beta:
+          if alpha >= beta:
             break
 
     node.alpha = alpha

@@ -31,6 +31,3 @@ The NodeTicTacToe class has the following methods:
 4. `heuristic(self) -> int`
    - Returns a heuristic value for the node based on the state of the board.
    - **Returns:** 1 if the state is a win for Max, -1 if the state is a win for Min, 0 if the state is a draw or non-terminal.
-
-TODO: write the methods with return values and explanations
-The Node class has the following methods:

@@ -1,5 +1,5 @@
 import random
-import Constants
+from . import Constants
 
 
 class TronMap:
@@ -262,6 +262,7 @@ class TronMap:
         return ""
 
     def _check_player_dead(self, x: int, y: int) -> int:
+        # FIXME: positions are being set as already occupied by a wall, thus the player is being killed by itself
         # If the position in the map is cero that means no one was there, therefore the player is safe
         # (in python 0 is a falsy value, that means "if 0" will result in NOT executing the if statement)
         return self._map[y][x]

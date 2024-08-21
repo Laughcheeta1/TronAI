@@ -1,7 +1,7 @@
 import numpy as np
 
 class Node ():
-  def __init__(self, state, value, operators, operator=None, parent=None, objective=None) -> None:
+  def __init__(self, state, value, game, objective, player: bool = True, operators=None, operator=None, parent=None) -> None:
     """
     Initializes a Node.
     
@@ -15,16 +15,18 @@ class Node ():
     
     Returns: None
     """
-    self.state= state
+    self.state = state
     self.value = value
     self.children = []
-    self.parent=parent
-    self.operator=operator
-    self.objective=objective
-    self.level=0
-    self.operators=operators
-    self.alpha=-np.inf # To be used by AlphaBeta
-    self.beta=np.inf # To be used by AlphaBeta
+    self.parent = parent
+    self.operator = operator
+    self.level = 0
+    self.operators = operators
+    self.player = player
+    self.game = game
+    self.objective = objective
+    self.alpha = -np.inf
+    self.beta = np.inf
 
   def add_child(self, value, state, operator) -> None:
     """
@@ -55,8 +57,7 @@ class Node ():
     self.children.append(node)
     return node
 
-  #Devuelve todos los estados según los operadores aplicados
-  def getChildren(self) -> List:
+  def getChildren(self) -> list:
     """
     Returns all the possible children of a node.
     
@@ -123,12 +124,17 @@ class Node ():
     Returns: 0 (default implementation)
     """
     return 0
-
   
   def isObjective(self) -> bool:
     """
-    Checks if the current node's state matches the objective's state.
-    
-    Returns: True if the current node's state matches the objective's state, False otherwise.
+    Method to be implemented by any custom implementation of the node class. It returns whether the node is the objective node or not.
     """
-    return (self.state==self.objective.state)
+    pass
+
+  def createOperators(self) -> list:
+    """
+    Method to be implemented by any custom implementation of the node class. It returns the list of operators for the node.
+    
+    Returns: A list of operators.
+    """
+    pass
