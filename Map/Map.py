@@ -153,7 +153,7 @@ class TronMap:
         if message := self._check_invalid_move(x, y):
             return Constants.INVALID, message
 
-        if killer := self._check_player_dead(x, y):  # Player stepped in a trail of another player
+        if killer := self.check_player_dead(x, y):  # Player stepped in a trail of another player
             self._num_players -= 1
             return Constants.PLAYER_DEAD, self._get_death_message(killer)
 
@@ -203,6 +203,24 @@ class TronMap:
 
         # -1 to account for adding the current place at first
         return len(visited) - 1
+
+    def check_player_dead(self, x: int, y: int) -> int:
+        """
+        Checks if a position that a player is moving to, will cause the death of the player.
+        In case it does, it returns the player that caused the death.
+
+        Returns
+        -------
+            The value of the position in the map. 0 means that has not been passed before,
+            otherwise it will return the player that has passed through that position before.
+
+            Remember that in python 0 is a falsy value, that means "if 0" will result in NOT 
+            executing the if statement, other values will be considered as True.
+
+            That is why this function works as a boolean of some sort, as well as knowing if
+            someone has passed through that position before.
+        """
+        return self._map[y][x]
 
     def _get_safe_moves(self, place) -> tuple[int, int]:
         """
@@ -260,12 +278,6 @@ class TronMap:
 
         # It is moving to the current position of a player
         return ""
-
-    def _check_player_dead(self, x: int, y: int) -> int:
-        # FIXME: positions are being set as already occupied by a wall, thus the player is being killed by itself
-        # If the position in the map is cero that means no one was there, therefore the player is safe
-        # (in python 0 is a falsy value, that means "if 0" will result in NOT executing the if statement)
-        return self._map[y][x]
 
     def _get_death_message(self, killer: int):
         return f"Player {self._current_player} was killed by Player {killer}"
