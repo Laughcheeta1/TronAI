@@ -4,10 +4,10 @@ from Map.Map import TronMap
 
 class TronNode(Node):
 
-  def __init__(self, **kwargs) -> None:
+  def __init__(self, root: bool = False, **kwargs) -> None:
     """
     Initializes a TronNode with a state, value, game, objective, and player.
-    Objective attribute for this implementation represents the player that is trying to win Max(True) or Min(False).
+    Objective attribute for this implementation represents wether a player won or lost.
     
     Parameters:
     - kwargs: Additional keyword arguments passed to the parent Node class.
@@ -15,9 +15,13 @@ class TronNode(Node):
     Returns: None
     """
     super(TronNode, self).__init__(**kwargs)
-    self.operators = self.createOperators()
     self.game: TronMap = self.game
-    self.updateGame()
+    self.whomWasItThatKilledMax = self.game.check_player_dead(self.state[0][0], self.state[0][1])
+    self.whomWasItThatKilledMin = self.game.check_player_dead(self.state[1][0], self.state[1][1])
+    # print("State: ", self.state, "Is player: ", self.player, ", Max died: ", self.whomWasItThatKilledMax, "Min died: ", self.whomWasItThatKilledMin, "Player count: ", self.game._num_players)
+    if not root:
+      self.updateGame()
+    self.operators = self.createOperators()
 
   def updateGame(self) -> None:
     """
@@ -49,17 +53,21 @@ class TronNode(Node):
     """
     # TODO: implement custom heuristic for the Tron game
     
-    # Temporary heuristic
-    # Check if max is dead and return -1
-    if self.game._check_player_dead(self.state[0][0], self.state[0][1]):
-      return -1
+    # Check if it is max's turn and if he died, if so return -1
+    if self.whomWasItThatKilledMax != 0 and self.whomWasItThatKilledMin != 0:
+      if self.player:
+        # print("Min died", self.state, "Player: ", self.player)
+        return np.inf
+      else:
+        # print("Max died", self.state, "Player: ", self.player)
+        return -np.inf
     
-    # Check if min is dead and return 1
-    if self.game._check_player_dead(self.state[1][0], self.state[1][1]):
-      return 1
-    
-    # Return 0 if the game is not over
-    return 0
+    # Check if it is not max's turn and if Min died, if so return -1
+    heuristic = 0
+    heuristic += self.game.count_reachable_spaces(1, 4)
+    heuristic -= self.game.count_reachable_spaces(2, 4)
+    # print("Heuristic: ", heuristic)
+    return heuristic
   
   def isObjective(self) -> bool:
     """
@@ -68,19 +76,10 @@ class TronNode(Node):
     Returns: True if the node is an objective node, False otherwise.
     """
 
-
-    # FIXME: This method is not working properly due to the position where a player is being technically already occupied, the following is a temporary workaround
-    return False if self.game._num_players > 1 else True
-
-    # Objective determines if we are looking for a Max win or a Min win
-
-    # If we are looking for a Max win, we check if Min is dead
-    if self.objective:
-      return self.game._check_player_dead(self.state[1][0], self.state[1][1])
+    if self.whomWasItThatKilledMax != 0 and self.whomWasItThatKilledMin != 0:
+      return True
     
-    # If we are looking for a Min win, we check if Max is dead
-    if not self.objective:
-      return self.game._check_player_dead(self.state[0][0], self.state[0][1])
+    return False
   
   def createOperators(self) -> list:
     """
@@ -93,8 +92,9 @@ class TronNode(Node):
     activePlayerIndex = 0 if self.player else 1
     inactivePlayerIndex = 1 if self.player else 0
 
-    tempOperator = [0, 0]
-    for operator in self.game._get_safe_moves(self.state[activePlayerIndex]):
+    
+    for operator in self.game.get_available_moves():
+      tempOperator = [0, 0]
       tempOperator[activePlayerIndex] = operator
       tempOperator[inactivePlayerIndex] = self.state[inactivePlayerIndex]
       operators.append(tempOperator)

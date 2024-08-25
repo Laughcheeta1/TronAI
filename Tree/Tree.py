@@ -1,20 +1,19 @@
+from copy import deepcopy
 from . import Node
 import numpy as np
 
 class Tree ():
-  def __init__(self, game, objective) -> None:
+  def __init__(self, game) -> None:
     """
     Initializes the Tree with a root node and an objective for the game.
     
     Parameters:
     - game: The game object to be used for the tree.
-    - objective: The objective for the game (e.g., win for Max or Min).
 
     Returns: None
     """
     self.game=game
-    self.objective=objective
-    self.root: Node = type(self).rootNode(game=game, objective=objective)
+    self.root: Node = type(self).rootNode(game=game)
 
   def printPath(self,n) -> list[str]:
     """
@@ -59,7 +58,33 @@ class Tree ():
     Returns: The node representing the best move.
     """
     # TODO: Change parameters to self.root.alpha and self.root.beta
-    self.root.beta, self.root.alpha = self.alphaBetaR(self.root, depth, maxPlayer, self.root.alpha, self.root.beta)
+
+    # Generate root children
+    children=self.root.getChildren()
+    # Max player
+    if maxPlayer:
+      for i,child in enumerate(children):
+        if child is not None:
+          newChild = type(self.root)(value = self.root.value+'-'+str(i), state = child,operator=i, parent = self.root,
+                                      game = deepcopy(self.root.game), player=False)
+          newChild = self.root.add_node_child(newChild)
+          self.root.alpha = max(self.root.alpha,self.alphaBetaR(newChild,depth-1,False, self.root.alpha, self.root.beta)[1])
+          newChild.alpha = self.root.alpha
+          newChild.beta = self.root.beta
+          if self.root.alpha >= self.root.beta:
+            break
+
+    else: # Min player
+      for i,child in enumerate(children):
+        if child is not None:
+          newChild = type(self.root)(value = self.root.value+'-'+str(i), state = child, operator = i, parent = self.root,
+                                      game = deepcopy(self.root.game), player = True)
+          newChild = self.root.add_node_child(newChild)
+          self.root.beta = min(self.root.beta,self.alphaBetaR(newChild,depth-1,True, self.root.alpha, self.root.beta)[0])
+          newChild.alpha = self.root.alpha
+          newChild.beta = self.root.beta
+          if self.root.alpha >= self.root.beta:
+            break
 
     if maxPlayer:
       # Compare all children of root and find the one with the maximum alpha
@@ -97,13 +122,12 @@ class Tree ():
     
     # Generate node children
     children=node.getChildren()
-
     # Max player
     if maxPlayer:
       for i,child in enumerate(children):
         if child is not None:
-          newChild = type(self.root)(value = node.value+'-'+str(i), state = child,operator=i, parent = node,
-                                      objective = self.objective, game = node.game, player=False)
+          newChild = type(self.root)(value = node.value+'-'+str(i), state = child,operator=i, parent = node, 
+                                     game = deepcopy(node.game), player=False)
           newChild = node.add_node_child(newChild)
           alpha = max(alpha,self.alphaBetaR(newChild,depth-1,False, alpha, beta)[1])
           newChild.alpha = alpha
@@ -115,7 +139,7 @@ class Tree ():
       for i,child in enumerate(children):
         if child is not None:
           newChild = type(self.root)(value = node.value+'-'+str(i), state = child, operator = i, parent = node,
-                                      objective = self.objective, game = node.game, player = True)
+                                     game = deepcopy(node.game), player = True)
           newChild = node.add_node_child(newChild)
           beta = min(beta,self.alphaBetaR(newChild,depth-1,True, alpha, beta)[0])
           newChild.alpha = alpha

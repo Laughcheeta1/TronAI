@@ -1,7 +1,7 @@
 import numpy as np
 
 class Node ():
-  def __init__(self, state, value, game, objective, player: bool = True, operators=None, operator=None, parent=None) -> None:
+  def __init__(self, state, value, game, player: bool = True, operators=None, operator=None, parent=None) -> None:
     """
     Initializes a Node.
     
@@ -11,7 +11,6 @@ class Node ():
     - operators: A list of operators to determine future children.
     - operator: Operator used to create this node.
     - parent: Parent node.
-    - objective: Node representing the ideal state.
     
     Returns: None
     """
@@ -24,7 +23,6 @@ class Node ():
     self.operators = operators
     self.player = player
     self.game = game
-    self.objective = objective
     self.alpha = -np.inf
     self.beta = np.inf
 
