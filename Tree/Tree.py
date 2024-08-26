@@ -57,7 +57,6 @@ class Tree ():
     
     Returns: The node representing the best move.
     """
-    # TODO: Change parameters to self.root.alpha and self.root.beta
 
     # Generate root children
     children=self.root.getChildren()

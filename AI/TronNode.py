@@ -4,17 +4,20 @@ from Map.Map import TronMap
 
 class TronNode(Node):
 
-  def __init__(self, root: bool = False, **kwargs) -> None:
+  def __init__(self, root: bool = False, reachableSpaces: int = 7, **kwargs) -> None:
     """
     Initializes a TronNode with a state, value, game, objective, and player.
     Objective attribute for this implementation represents wether a player won or lost.
     
     Parameters:
+    - root: Boolean indicating if the node is the root node.
+    - reachAbleSpaces: The number of reachable spaces for each player, this is used for difficulty purposes.
     - kwargs: Additional keyword arguments passed to the parent Node class.
     
     Returns: None
     """
     super(TronNode, self).__init__(**kwargs)
+    self.reachableSpaces = reachableSpaces
     self.game: TronMap = self.game
     self.whomWasItThatKilledMax = self.game.check_player_dead(self.state[0][0], self.state[0][1])
     self.whomWasItThatKilledMin = self.game.check_player_dead(self.state[1][0], self.state[1][1])
@@ -31,6 +34,20 @@ class TronNode(Node):
     """
     activePlayerIndex = 1 if self.player else 0
     self.game.add_move(self.state[activePlayerIndex][0], self.state[activePlayerIndex][1])
+
+  def add_node_child(self, node) -> None:
+    """
+    Adds a child node to the current node.
+    
+    Parameters:
+    - node: The child node to be added.
+    
+    Returns: None
+    """
+    node.level=node.parent.level+1
+    node.reachableSpaces = node.parent.reachableSpaces
+    self.children.append(node)
+    return node
 
   def getState(self, index: int) -> list | None:
     """
@@ -50,12 +67,10 @@ class TronNode(Node):
     Returns a heuristic value for the node based on the state of the board.
     
     Returns: 1 if the state is a win for Max, -1 if the state is a win for Min, 0 if the state is a draw or non-terminal.
-    """
-    # TODO: implement custom heuristic for the Tron game
-    
+    """   
     
     # Check reachable spaces for each player
-    heuristic = self.level if self.player else -self.level
+    heuristic = -self.level if self.player else self.level
     
     # Check if a player died
     if self.whomWasItThatKilledMax != 0 and self.whomWasItThatKilledMin != 0:
@@ -67,8 +82,8 @@ class TronNode(Node):
         # print("Max died", self.state, "Player: ", self.player)
         return heuristic - self.game._height * self.game._width
 
-    heuristic += self.game.count_reachable_spaces(1, 4)
-    heuristic -= self.game.count_reachable_spaces(2, 4)
+    heuristic += self.game.count_reachable_spaces(1, self.reachableSpaces)
+    heuristic -= self.game.count_reachable_spaces(2, self.reachableSpaces)
     return heuristic
   
   def isObjective(self) -> bool:

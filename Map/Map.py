@@ -23,7 +23,8 @@ class TronMap:
         self._map = [[0 for x in range(width)] for y in range(height)]
 
         self._current_player = 1
-        self._positions = self._generate_random_positions()
+        # self._positions = self._generate_random_positions()
+        self._positions = [(0, 0), (width - 1, height - 1)]
 
         # we put map[y][x] because in the structure defined in line 14,
         # each row y contains the columns x
