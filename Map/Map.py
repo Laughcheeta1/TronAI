@@ -260,11 +260,10 @@ class TronMap:
         for _ in range(self._num_players):
             rand_pos = (random.randint(0, self._width - 1), random.randint(0, self._height - 1))
 
-            # FIXME: This condition is never met because the map is initialized with 0s and never changes, causing players to spawn on top of each other sometimes
-            while self._map[rand_pos[0]][rand_pos[1]] != 0:
-                rand_pos = (random.randint(0, self._width), random.randint(0, self._height))
+            while rand_pos in positions:
+                rand_pos = (random.randint(0, self._width - 1), random.randint(0, self._height - 1))
 
-            positions.append(rand_pos)  # Return the current random position (honestly used yield just because)
+            positions.append(rand_pos)
 
         return positions
 
