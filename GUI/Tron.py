@@ -1,9 +1,10 @@
-import pygame
 import sys
-from Map.Map import TronMap
-from AI.TronTree import TronTree
-from AI.TronNode import TronNode
 from copy import deepcopy
+
+import pygame
+
+from AI import recommend
+from Map.Map import TronMap
 
 # Initialize Pygame
 pygame.init()
@@ -66,14 +67,44 @@ def draw_title(mode):
     screen.blit(title_surface, text_rect)
 
 
-def move(game: TronMap, is_max_player: bool):
-    treeAlphaBeta = TronTree(deepcopy(game), is_max_player)
-    objective = treeAlphaBeta.alphaBeta(4, maxPlayer=is_max_player)
-    player = MAX_PLAYER if is_max_player else (3 - MAX_PLAYER)
-    game.add_move(objective.state[player - 1][0], objective.state[player - 1][1])
+def move(game: TronMap, is_max_player: bool, difficulty: str):
+    recommended_move = recommend(deepcopy(game), is_max_player, difficulty)
+    game.add_move(recommended_move[0], recommended_move[1])
 
 
-def play_game(player_vs_ai=True):
+def select_difficulty():
+    while True:
+        screen.fill(BLACK)
+        title = font.render("Select Difficulty", True, WHITE)
+        option1 = font.render("1. Easy", True, WHITE)
+        option2 = font.render("2. Medium", True, WHITE)
+        option3 = font.render("3. Hard", True, WHITE)
+        option4 = font.render("4. Back to Main Menu", True, WHITE)
+
+        screen.blit(title, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 - 100))
+        screen.blit(option1, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2))
+        screen.blit(option2, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 50))
+        screen.blit(option3, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 100))
+        screen.blit(option4, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 150))
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    play_game(player_vs_ai=True, difficulty="easy")
+                elif event.key == pygame.K_2:
+                    play_game(player_vs_ai=True, difficulty="medium")
+                elif event.key == pygame.K_3:
+                    play_game(player_vs_ai=True, difficulty="hard")
+                elif event.key == pygame.K_4:
+                    main_menu()
+
+
+def play_game(player_vs_ai=True, difficulty="hard"):
     game = TronMap(GAME_WIDTH, GAME_HEIGHT, NUM_PLAYERS)
     turns = [0, 0]
     clock = pygame.time.Clock()
@@ -120,32 +151,22 @@ def play_game(player_vs_ai=True):
                     last_pos = current_pos
 
         else:
-            move(game, is_max_player)
+            move(game, is_max_player, difficulty)
             turns[current_player - 1] += 1
 
         # Draw the title at the bottom
         draw_title(mode)
 
         pygame.display.flip()
-        clock.tick(120)  # Limit to 5 FPS for visibility
+        clock.tick(30)  # Limit to 5 FPS for visibility
 
     # Game over
     screen.fill(BLACK)
     draw_grid(game)
 
     # Determine the winner
-    player1_alive = (
-        game.check_player_dead(
-            game.get_player_position(1)[0], game.get_player_position(1)[1]
-        )
-        == 0
-    )
-    player2_alive = (
-        game.check_player_dead(
-            game.get_player_position(2)[0], game.get_player_position(2)[1]
-        )
-        == 0
-    )
+    player1_alive = (game.check_player_dead(game.get_player_position(1)[0], game.get_player_position(1)[1]) == 0)
+    player2_alive = (game.check_player_dead(game.get_player_position(2)[0], game.get_player_position(2)[1]) == 0)
 
     if player1_alive and not player2_alive:
         winner = "Player 1"
@@ -157,23 +178,15 @@ def play_game(player_vs_ai=True):
     # Draw a black rectangle behind the game over text
     game_over_text = font.render("Game Over! (0 to go to Main Menu)", True, WHITE)
     winner_text = font.render(f"Winner: {winner}", True, WHITE)
-    turns_text = font.render(
-        f"Total turns - P1: {turns[0]}, P2: {turns[1]}", True, WHITE
-    )
+    turns_text = font.render(f"Total turns - P1: {turns[0]}, P2: {turns[1]}", True, WHITE)
 
     # Calculate text positions
-    game_over_rect = game_over_text.get_rect(
-        center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50)
-    )
+    game_over_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50))
     winner_rect = winner_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-    turns_rect = turns_text.get_rect(
-        center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50)
-    )
+    turns_rect = turns_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
 
     # Draw rectangles behind the text
-    pygame.draw.rect(
-        screen, BLACK, game_over_rect.inflate(20, 10)
-    )  # Inflate for padding
+    pygame.draw.rect(screen, BLACK, game_over_rect.inflate(20, 10))  # Inflate for padding
     pygame.draw.rect(screen, BLACK, winner_rect.inflate(20, 10))
     pygame.draw.rect(screen, BLACK, turns_rect.inflate(20, 10))
 
@@ -219,7 +232,7 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:
-                    play_game(player_vs_ai=True)
+                    select_difficulty()
                 elif event.key == pygame.K_2:
                     play_game(player_vs_ai=False)  # AI vs AI mode
                 elif event.key == pygame.K_3:
