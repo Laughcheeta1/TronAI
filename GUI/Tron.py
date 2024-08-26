@@ -77,6 +77,7 @@ def play_game(player_vs_ai=True):
     game = TronMap(GAME_WIDTH, GAME_HEIGHT, NUM_PLAYERS)
     turns = [0, 0]
     clock = pygame.time.Clock()
+    last_pos = None
 
     # Set the game mode for the title
     mode = "human_vs_ai" if player_vs_ai else "ai_vs_ai"
@@ -103,23 +104,21 @@ def play_game(player_vs_ai=True):
             current_pos = game.get_player_position(current_player)
             new_pos = current_pos
 
-            if keys[pygame.K_UP]:
-                print("UP")
+            if keys[pygame.K_LEFT]:
                 new_pos = (current_pos[0] - 1, current_pos[1])
-            elif keys[pygame.K_DOWN]:
-                print("DOWN")
-                new_pos = (current_pos[0] + 1, current_pos[1])
-            elif keys[pygame.K_LEFT]:
-                print("LEFT")
-                new_pos = (current_pos[0], current_pos[1] - 1)
             elif keys[pygame.K_RIGHT]:
-                print("RIGHT")
+                new_pos = (current_pos[0] + 1, current_pos[1])
+            elif keys[pygame.K_UP]:
+                new_pos = (current_pos[0], current_pos[1] - 1)
+            elif keys[pygame.K_DOWN]:
                 new_pos = (current_pos[0], current_pos[1] + 1)
 
-            if new_pos != current_pos:
+            if new_pos != current_pos and new_pos != last_pos:
                 status, _ = game.add_move(new_pos[0], new_pos[1])
                 if status == 200:  # VALID
                     turns[current_player - 1] += 1
+                    last_pos = current_pos
+
         else:
             move(game, is_max_player)
             turns[current_player - 1] += 1
