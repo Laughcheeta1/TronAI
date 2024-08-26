@@ -1,3 +1,9 @@
+"""
+WARNING
+This is the CLI version of the Tron game, it's not production-ready and lacks many features and fixes.
+Use the GUI version instead.
+"""
+
 from Map.Map import TronMap
 from AI.TronTree import TronTree
 from AI.TronNode import TronNode
