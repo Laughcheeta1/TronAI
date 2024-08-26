@@ -1,3 +1,4 @@
+from copy import deepcopy
 from AI import TronNode, TronTree
 from Map.Map import TronMap
 
@@ -37,6 +38,7 @@ def originalTests():
   # display(tree_image)
 
 def gameBetweenAI():
+  nodes = []
   game = TronMap()
   print("Number of players:", game._num_players)
   game.print_map()
@@ -51,9 +53,10 @@ def gameBetweenAI():
     currentPlayer = not currentPlayer
 
   print(game.get_players_positions())
+  return game
 
 def move(game: TronMap, player: bool):
-  treeAlphaBeta = TronTree(game, player)
+  treeAlphaBeta = TronTree(deepcopy(game), player)
   objective = treeAlphaBeta.alphaBeta(5, maxPlayer=treeAlphaBeta.root.player)
   if player:
     game.add_move(objective.state[0][0], objective.state[0][1])
@@ -61,6 +64,7 @@ def move(game: TronMap, player: bool):
   else:
     game.add_move(objective.state[1][0], objective.state[1][1])
     print("Decision Min:", objective.state[1][0], ",", objective.state[1][1])
+
 
 if __name__ == "__main__":
   gameBetweenAI()

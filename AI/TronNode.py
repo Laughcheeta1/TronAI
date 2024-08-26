@@ -53,20 +53,22 @@ class TronNode(Node):
     """
     # TODO: implement custom heuristic for the Tron game
     
-    # Check if it is max's turn and if he died, if so return -1
+    
+    # Check reachable spaces for each player
+    heuristic = self.level if self.player else -self.level
+    
+    # Check if a player died
     if self.whomWasItThatKilledMax != 0 and self.whomWasItThatKilledMin != 0:
+      # Check which player died
       if self.player:
         # print("Min died", self.state, "Player: ", self.player)
-        return np.inf
+        return heuristic + self.game._height * self.game._width
       else:
         # print("Max died", self.state, "Player: ", self.player)
-        return -np.inf
-    
-    # Check if it is not max's turn and if Min died, if so return -1
-    heuristic = 0
+        return heuristic - self.game._height * self.game._width
+
     heuristic += self.game.count_reachable_spaces(1, 4)
     heuristic -= self.game.count_reachable_spaces(2, 4)
-    # print("Heuristic: ", heuristic)
     return heuristic
   
   def isObjective(self) -> bool:
