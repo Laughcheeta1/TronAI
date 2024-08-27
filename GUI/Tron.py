@@ -38,6 +38,12 @@ pygame.display.set_caption("Tron")
 # Font
 font = pygame.font.Font(None, 36)
 
+# Load background music
+music_path = os.path.join(parent_dir, "Assets", "background_music.mp3")
+pygame.mixer.music.load(music_path)
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.5)
+
 
 def draw_grid(game):
     for y in range(GAME_HEIGHT):
@@ -245,6 +251,11 @@ def main_menu():
                     pygame.quit()
                     sys.exit()
 
+def toggle_music():
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.pause()
+    else:
+        pygame.mixer.music.unpause()
 
 if __name__ == "__main__":
     main_menu()
