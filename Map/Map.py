@@ -1,4 +1,5 @@
 import random
+
 from . import Constants
 
 
@@ -209,6 +210,7 @@ class TronMap:
         """
         Checks if a position that a player is moving to, will cause the death of the player.
         In case it does, it returns the player that caused the death.
+        Takes care of negative indexes and indexes that are out of the map.
 
         Returns
         -------
@@ -221,6 +223,9 @@ class TronMap:
             That is why this function works as a boolean of some sort, as well as knowing if
             someone has passed through that position before.
         """
+        if x >= self._width or y >= self._height or x < 0 or y < 0:
+            return self._current_player
+
         return self._map[y][x]
 
     def _get_safe_moves(self, place) -> tuple[int, int]:
