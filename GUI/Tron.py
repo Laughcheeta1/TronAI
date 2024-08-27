@@ -1,8 +1,14 @@
+import os
 import sys
-from copy import deepcopy
 
 import pygame
 
+# Add the parent directory to the path
+gui_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(gui_dir)
+sys.path.append(parent_dir)
+
+from copy import deepcopy
 from AI import recommend
 from Map.Map import TronMap
 
