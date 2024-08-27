@@ -67,11 +67,6 @@ def draw_title(mode):
     screen.blit(title_surface, text_rect)
 
 
-def move(game: TronMap, is_max_player: bool, difficulty: str):
-    recommended_move = recommend(deepcopy(game), is_max_player, difficulty)
-    game.add_move(recommended_move[0], recommended_move[1])
-
-
 def select_difficulty():
     while True:
         screen.fill(BLACK)
@@ -109,11 +104,13 @@ def play_game(player_vs_ai=True, difficulty="hard"):
     turns = [0, 0]
     clock = pygame.time.Clock()
     last_pos = None
+    is_max_player = False
 
     # Set the game mode for the title
     mode = "human_vs_ai" if player_vs_ai else "ai_vs_ai"
 
     while not game.game_finished():
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -151,7 +148,8 @@ def play_game(player_vs_ai=True, difficulty="hard"):
                     last_pos = current_pos
 
         else:
-            move(game, is_max_player, difficulty)
+            recommended_move = recommend(deepcopy(game), is_max_player, difficulty)
+            game.add_move(recommended_move[0], recommended_move[1])
             turns[current_player - 1] += 1
 
         # Draw the title at the bottom
@@ -165,34 +163,36 @@ def play_game(player_vs_ai=True, difficulty="hard"):
     draw_grid(game)
 
     # Determine the winner
-    player1_alive = (game.check_player_dead(game.get_player_position(1)[0], game.get_player_position(1)[1]) == 0)
-    player2_alive = (game.check_player_dead(game.get_player_position(2)[0], game.get_player_position(2)[1]) == 0)
 
-    if player1_alive and not player2_alive:
+    if not is_max_player:
         winner = "Player 1"
-    elif player2_alive and not player1_alive:
-        winner = "Player 2"
+        loser = "Player 2"
     else:
-        winner = "Draw"
+        winner = "Player 2"
+        loser = "Player 1"
 
     # Draw a black rectangle behind the game over text
     game_over_text = font.render("Game Over! (0 to go to Main Menu)", True, WHITE)
     winner_text = font.render(f"Winner: {winner}", True, WHITE)
+    fucking_loser = font.render(f"Loser: {loser}", True, WHITE)
     turns_text = font.render(f"Total turns - P1: {turns[0]}, P2: {turns[1]}", True, WHITE)
 
     # Calculate text positions
     game_over_rect = game_over_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 50))
     winner_rect = winner_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-    turns_rect = turns_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
+    fucking_loser_rect = fucking_loser.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 50))
+    turns_rect = turns_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 100))
 
     # Draw rectangles behind the text
     pygame.draw.rect(screen, BLACK, game_over_rect.inflate(20, 10))  # Inflate for padding
     pygame.draw.rect(screen, BLACK, winner_rect.inflate(20, 10))
+    pygame.draw.rect(screen, BLACK, fucking_loser_rect.inflate(20, 10))
     pygame.draw.rect(screen, BLACK, turns_rect.inflate(20, 10))
 
     # Blit the text
     screen.blit(game_over_text, game_over_rect)
     screen.blit(winner_text, winner_rect)
+    screen.blit(fucking_loser, fucking_loser_rect)
     screen.blit(turns_text, turns_rect)
 
     pygame.display.flip()
