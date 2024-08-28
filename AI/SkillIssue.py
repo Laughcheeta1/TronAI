@@ -25,5 +25,8 @@ def recommend(game, maxPlayer, difficulty) -> list[int, int]:
             print("Invalid difficulty level. Using easy level by default.")
         tree = TronTree(game, maxPlayer, nodeReachableSpaces=DifficultyConstants.EASY[1])
         move = tree.alphaBeta(DifficultyConstants.EASY[0], maxPlayer)
-
+    # print("Max" if maxPlayer else "Min", end=": ")
+    # for node in move.parent.children:
+    #     print(node.state, "Alpha", node.alpha, "Beta", node.beta, end="\t")
+    # print()
     return move.state[0] if maxPlayer else move.state[1]
