@@ -18,9 +18,9 @@ pygame.init()
 # Constants
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-GRID_SIZE = 15
-GAME_WIDTH = 35
-GAME_HEIGHT = 35
+GRID_SIZE = 35
+GAME_WIDTH = 14
+GAME_HEIGHT = 14
 NUM_PLAYERS = 2
 MAX_PLAYER = 1
 
@@ -39,11 +39,17 @@ pygame.display.set_caption("Tron")
 font = pygame.font.Font(None, 36)
 
 # Load background music
-music_path = os.path.join(parent_dir, "Assets", "background_music.mp3")
-pygame.mixer.music.load(music_path)
-pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.5)
+def load_music(music_file):
+    music_path = os.path.join(parent_dir, "Assets", music_file)
+    pygame.mixer.music.load(music_path)
+    pygame.mixer.music.play(-1)
+    pygame.mixer.music.set_volume(0.5)
 
+load_music("background_music.mp3")
+
+def change_music(music_file):
+    pygame.mixer.music.stop()
+    load_music(music_file)
 
 def draw_grid(game):
     for y in range(GAME_HEIGHT):
@@ -112,6 +118,9 @@ def select_difficulty():
 
 
 def play_game(player_vs_ai=True, difficulty="hard"):
+    if not player_vs_ai:
+        change_music("IAvsIA_bm.mp3")
+
     game = TronMap(GAME_WIDTH, GAME_HEIGHT, NUM_PLAYERS)
     turns = [0, 0]
     clock = pygame.time.Clock()
@@ -224,6 +233,7 @@ def play_game(player_vs_ai=True, difficulty="hard"):
 
 
 def main_menu():
+    change_music("background_music.mp3")
     while True:
         screen.fill(BLACK)
         title = font.render("Tron", True, WHITE)

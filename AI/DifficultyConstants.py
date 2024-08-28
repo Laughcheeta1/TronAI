@@ -4,4 +4,4 @@ This constants are used to define the difficulty of the game, the higher the dif
 
 EASY = (3, 10)
 MEDIUM = (4, 20)
-HARD = (6, 40)
+HARD = (10, 25)
