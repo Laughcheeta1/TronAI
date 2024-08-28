@@ -1,8 +1,9 @@
-from Tree.Node import Node
+from Tree import Node
 import numpy as np
 
 class NodeTicTacToe(Node):
   """
+    TODO: remove this class, as it is no longer compatible with the implementation of the Tree class. 
     This class is used exclusively for testing with the tic-tac-toe game
   """
 

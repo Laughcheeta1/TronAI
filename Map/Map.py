@@ -1,5 +1,6 @@
 import random
-import Constants
+
+from . import Constants
 
 
 class TronMap:
@@ -23,7 +24,8 @@ class TronMap:
         self._map = [[0 for x in range(width)] for y in range(height)]
 
         self._current_player = 1
-        self._positions = self._generate_random_positions()
+        # self._positions = self._generate_random_positions()
+        self._positions = [(0, 0), (width - 1, height - 1)]
 
         # we put map[y][x] because in the structure defined in line 14,
         # each row y contains the columns x
@@ -153,7 +155,7 @@ class TronMap:
         if message := self._check_invalid_move(x, y):
             return Constants.INVALID, message
 
-        if killer := self._check_player_dead(x, y):  # Player stepped in a trail of another player
+        if killer := self.check_player_dead(x, y):  # Player stepped in a trail of another player
             self._num_players -= 1
             return Constants.PLAYER_DEAD, self._get_death_message(killer)
 
@@ -204,6 +206,28 @@ class TronMap:
         # -1 to account for adding the current place at first
         return len(visited) - 1
 
+    def check_player_dead(self, x: int, y: int) -> int:
+        """
+        Checks if a position that a player is moving to, will cause the death of the player.
+        In case it does, it returns the player that caused the death.
+        Takes care of negative indexes and indexes that are out of the map.
+
+        Returns
+        -------
+            The value of the position in the map. 0 means that has not been passed before,
+            otherwise it will return the player that has passed through that position before.
+
+            Remember that in python 0 is a falsy value, that means "if 0" will result in NOT 
+            executing the if statement, other values will be considered as True.
+
+            That is why this function works as a boolean of some sort, as well as knowing if
+            someone has passed through that position before.
+        """
+        if x >= self._width or y >= self._height or x < 0 or y < 0:
+            return self._current_player
+
+        return self._map[y][x]
+
     def _get_safe_moves(self, place) -> tuple[int, int]:
         """
         Get the safe moves from a certain place in the map
@@ -242,10 +266,10 @@ class TronMap:
         for _ in range(self._num_players):
             rand_pos = (random.randint(0, self._width - 1), random.randint(0, self._height - 1))
 
-            while self._map[rand_pos[0]][rand_pos[1]] != 0:
-                rand_pos = (random.randint(0, self._width), random.randint(0, self._height))
+            while rand_pos in positions:
+                rand_pos = (random.randint(0, self._width - 1), random.randint(0, self._height - 1))
 
-            positions.append(rand_pos)  # Return the current random position (honestly used yield just because)
+            positions.append(rand_pos)
 
         return positions
 
@@ -260,11 +284,6 @@ class TronMap:
 
         # It is moving to the current position of a player
         return ""
-
-    def _check_player_dead(self, x: int, y: int) -> int:
-        # If the position in the map is cero that means no one was there, therefore the player is safe
-        # (in python 0 is a falsy value, that means "if 0" will result in NOT executing the if statement)
-        return self._map[y][x]
 
     def _get_death_message(self, killer: int):
         return f"Player {self._current_player} was killed by Player {killer}"

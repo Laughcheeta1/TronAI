@@ -28,5 +28,8 @@ The Map class has the following public methods:
 -  `count_reachable_spaces(self, player: int, steps: int = 3) -> int`: returns the number of reachable spaces for a 
     player in a certain number of steps (Supposes that the opponent is not going to move, this is for the heuristic of 
     the game).
+- `check_player_dead(self, x: int, y: int) -> int`: it returns if a move that a player makes, will result in its death. 
+    It returns 0 if the player is not dead, otherwise it returns the player that killed it.
+    (Remember that in python, 0 is a falsy value and any other number is truthy value, therefore the function can be used as a boolean for if statements).
 
 For more detailed information check the actual methods, they are well documented.
