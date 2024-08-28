@@ -120,6 +120,10 @@ def select_difficulty():
 def play_game(player_vs_ai=True, difficulty="hard"):
     if not player_vs_ai:
         change_music("IAvsIA_bm.mp3")
+    elif player_vs_ai and difficulty == "medium":
+        change_music("IAvsPlayer_medium.mp3")
+    elif player_vs_ai and difficulty == "hard":
+        change_music("IAvsPlayer_hard.mp3")
 
     game = TronMap(GAME_WIDTH, GAME_HEIGHT, NUM_PLAYERS)
     turns = [0, 0]
